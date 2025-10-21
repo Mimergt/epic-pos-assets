@@ -111,29 +111,11 @@ class PosAssetManager(models.Model):
             company = self.env.company
             
             if self.asset_type == 'favicon':
-                # In Odoo, favicon is handled through web.favicon attachment
-                # Create or update the favicon attachment
-                Attachment = self.env['ir.attachment']
-                existing_favicon = Attachment.search([
-                    ('name', '=', 'web.favicon'),
-                    ('res_model', '=', 'res.company'),
-                    ('res_id', '=', company.id)
-                ], limit=1)
-                
-                attachment_vals = {
-                    'name': 'web.favicon',
-                    'datas': self.file_data,
-                    'res_model': 'res.company',
-                    'res_id': company.id,
-                    'type': 'binary',
-                }
-                
-                if existing_favicon:
-                    existing_favicon.write(attachment_vals)
-                else:
-                    Attachment.create(attachment_vals)
-                    
-                _logger.info(f"Favicon applied to company {company.name}")
+                # In Odoo 18, favicon is stored in logo_web field
+                company.write({
+                    'logo_web': self.file_data
+                })
+                _logger.info(f"Favicon applied to company {company.name} using logo_web field")
                 
             elif self.asset_type in ['logo_main', 'logo_dark', 'logo_light']:
                 # Apply logo to Odoo company
