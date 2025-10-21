@@ -9,8 +9,11 @@
                 <list string="POS Assets">
                     <field name="name"/>
                     <field name="asset_type"/>
+                    <field name="asset_category"/>
                     <field name="file_name"/>
-                    <field name="active"/>
+                    <field name="file_path"/>
+                    <field name="applied" widget="boolean_toggle"/>
+                    <field name="active" widget="boolean_toggle"/>
                 </list>
             </field>
         </record>
@@ -21,15 +24,36 @@
             <field name="model">epic.asset</field>
             <field name="arch" type="xml">
                 <form string="POS Asset">
+                    <header>
+                        <button name="action_apply_asset" string="Apply Asset" type="object" 
+                                class="oe_highlight" icon="fa-check"
+                                help="Apply this asset to the system"/>
+                        <field name="applied" widget="statusbar" statusbar_visible="false,true"/>
+                    </header>
                     <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                                <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="Asset name..."/>
+                            </h1>
+                        </div>
                         <group>
-                            <field name="name" placeholder="Asset name..."/>
-                            <field name="asset_type"/>
-                            <field name="active"/>
+                            <group>
+                                <field name="asset_type"/>
+                                <field name="asset_category"/>
+                                <field name="file_path" readonly="1"/>
+                            </group>
+                            <group>
+                                <field name="applied_date" readonly="1" attrs="{'invisible': [('applied', '=', False)]}"/>
+                            </group>
                         </group>
                         <group>
-                            <field name="file_data" filename="file_name" widget="binary"/>
-                            <field name="file_name" invisible="1"/>
+                            <field name="file_data" filename="file_name" widget="image" class="oe_avatar"/>
+                            <field name="file_name"/>
                         </group>
                         <group>
                             <field name="description" placeholder="Description..."/>

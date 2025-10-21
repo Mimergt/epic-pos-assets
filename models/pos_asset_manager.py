@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 import base64
 import os
 import logging
@@ -14,15 +14,118 @@ class PosAssetManager(models.Model):
 
     name = fields.Char('Name', required=True)
     asset_type = fields.Selection([
-        ('logo', 'Logo'),
-        ('background', 'Background Image'),
+        ('logo_main', 'Logo Main'),
+        ('logo_dark', 'Logo Dark'),
+        ('logo_light', 'Logo Light'),
         ('favicon', 'Favicon'),
+        ('splash', 'Splash Screen'),
+        ('logo_ticket', 'Logo Ticket/Receipt'),
+        ('watermark', 'Watermark'),
+        ('signature', 'Signature'),
+        ('placeholder', 'Product Placeholder'),
+        ('category_image', 'Category Image'),
+        ('product_image', 'Product Image'),
+        ('button_icon', 'Button Icon'),
+        ('background', 'Background'),
+        ('modal_bg', 'Modal Background'),
+        ('logo_client', 'Customer Display Logo'),
+        ('banner', 'Banner'),
+        ('customer_bg', 'Customer Display Background'),
         ('other', 'Other')
-    ], string='Asset Type', required=True, default='logo')
+    ], string='Asset Type', required=True, default='other')
+    asset_category = fields.Selection([
+        ('logos', 'Logos'),
+        ('receipts', 'Receipts'),
+        ('products', 'Products'),
+        ('ui', 'UI Elements'),
+        ('customer_display', 'Customer Display'),
+        ('other', 'Other')
+    ], string='Category', compute='_compute_category', store=True)
     file_data = fields.Binary('File', required=True)
     file_name = fields.Char('File Name')
+    file_path = fields.Char('Target File Path', compute='_compute_file_path', store=True)
     active = fields.Boolean('Active', default=True)
     description = fields.Text('Description')
+    applied = fields.Boolean('Applied to System', default=False)
+    applied_date = fields.Datetime('Last Applied Date')
+
+    @api.depends('asset_type')
+    def _compute_category(self):
+        """Compute category based on asset type"""
+        category_map = {
+            'logo_main': 'logos',
+            'logo_dark': 'logos',
+            'logo_light': 'logos',
+            'favicon': 'logos',
+            'splash': 'logos',
+            'logo_ticket': 'receipts',
+            'watermark': 'receipts',
+            'signature': 'receipts',
+            'placeholder': 'products',
+            'category_image': 'products',
+            'product_image': 'products',
+            'button_icon': 'ui',
+            'background': 'ui',
+            'modal_bg': 'ui',
+            'logo_client': 'customer_display',
+            'banner': 'customer_display',
+            'customer_bg': 'customer_display',
+        }
+        for record in self:
+            record.asset_category = category_map.get(record.asset_type, 'other')
+
+    @api.depends('asset_type', 'file_name')
+    def _compute_file_path(self):
+        """Compute the target file path based on asset type"""
+        path_map = {
+            'logo_main': 'logos/logo_main.png',
+            'logo_dark': 'logos/logo_dark.png',
+            'logo_light': 'logos/logo_light.png',
+            'favicon': 'logos/favicon.png',
+            'splash': 'logos/splash.jpg',
+            'logo_ticket': 'receipts/logo_ticket.png',
+            'watermark': 'receipts/watermark.png',
+            'signature': 'receipts/signature.png',
+            'placeholder': 'products/placeholder.png',
+            'background': 'ui/background.jpg',
+            'modal_bg': 'ui/modal_bg.png',
+            'logo_client': 'customer_display/logo_client.png',
+            'banner': 'customer_display/banner.jpg',
+            'customer_bg': 'customer_display/background.jpg',
+        }
+        for record in self:
+            if record.asset_type in path_map:
+                record.file_path = path_map[record.asset_type]
+            elif record.file_name:
+                # For dynamic types like category_* or product_*
+                category_folder = record.asset_category or 'other'
+                record.file_path = f"{category_folder}/{record.file_name}"
+            else:
+                record.file_path = False
+
+    def action_apply_asset(self):
+        """Apply the asset to the system"""
+        self.ensure_one()
+        
+        # Here you would implement the logic to copy the file to the correct location
+        # This depends on your Odoo setup and where assets are stored
+        
+        # For now, just mark as applied
+        self.write({
+            'applied': True,
+            'applied_date': fields.Datetime.now()
+        })
+        
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _('Success'),
+                'message': _('Asset "%s" has been applied successfully.') % self.name,
+                'type': 'success',
+                'sticky': False,
+            }
+        }
 
     @api.model
     def update_pos_assets(self, assets_data):

@@ -60,14 +60,45 @@ class UploadAssetsWizard(models.TransientModel):
                     file_content = zip_file.read(file_info.filename)
                     file_b64 = base64.b64encode(file_content).decode('utf-8')
                     
-                    # Determine asset type based on filename
+                    # Determine asset type based on filename and path
                     filename_lower = file_info.filename.lower()
-                    if 'logo' in filename_lower:
-                        asset_type = 'logo'
+                    file_base = os.path.splitext(os.path.basename(file_info.filename))[0].lower()
+                    
+                    # Map based on your structure
+                    if 'logo_main' in filename_lower or file_base == 'logo_main':
+                        asset_type = 'logo_main'
+                    elif 'logo_dark' in filename_lower or file_base == 'logo_dark':
+                        asset_type = 'logo_dark'
+                    elif 'logo_light' in filename_lower or file_base == 'logo_light':
+                        asset_type = 'logo_light'
+                    elif 'favicon' in filename_lower:
+                        asset_type = 'favicon'
+                    elif 'splash' in filename_lower:
+                        asset_type = 'splash'
+                    elif 'logo_ticket' in filename_lower or file_base == 'logo_ticket':
+                        asset_type = 'logo_ticket'
+                    elif 'watermark' in filename_lower:
+                        asset_type = 'watermark'
+                    elif 'signature' in filename_lower:
+                        asset_type = 'signature'
+                    elif 'placeholder' in filename_lower:
+                        asset_type = 'placeholder'
+                    elif 'category_' in filename_lower:
+                        asset_type = 'category_image'
+                    elif 'product_' in filename_lower:
+                        asset_type = 'product_image'
+                    elif 'button' in filename_lower or 'icon' in filename_lower:
+                        asset_type = 'button_icon'
                     elif 'background' in filename_lower or 'bg' in filename_lower:
                         asset_type = 'background'
-                    elif 'favicon' in filename_lower or 'icon' in filename_lower:
-                        asset_type = 'favicon'
+                    elif 'modal' in filename_lower:
+                        asset_type = 'modal_bg'
+                    elif 'logo_client' in filename_lower or file_base == 'logo_client':
+                        asset_type = 'logo_client'
+                    elif 'banner' in filename_lower:
+                        asset_type = 'banner'
+                    elif 'customer' in filename_lower:
+                        asset_type = 'customer_bg'
                     else:
                         asset_type = 'other'
                     
