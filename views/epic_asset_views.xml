@@ -28,7 +28,6 @@
                         <button name="action_apply_asset" string="Apply Asset" type="object" 
                                 class="oe_highlight" icon="fa-check"
                                 help="Apply this asset to the system"/>
-                        <field name="applied" widget="statusbar" statusbar_visible="false,true"/>
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
@@ -36,6 +35,7 @@
                                 <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
                             </button>
                         </div>
+                        <widget name="web_ribbon" title="Applied" bg_color="text-bg-success" invisible="not applied"/>
                         <div class="oe_title">
                             <h1>
                                 <field name="name" placeholder="Asset name..."/>
@@ -46,6 +46,7 @@
                                 <field name="asset_type"/>
                                 <field name="asset_category"/>
                                 <field name="file_path" readonly="1"/>
+                                <field name="applied" widget="boolean"/>
                             </group>
                             <group>
                                 <field name="applied_date" readonly="1" invisible="not applied"/>
