@@ -108,17 +108,35 @@ class PosAssetManager(models.Model):
         self.ensure_one()
         
         try:
+            company = self.env.company
+            
             if self.asset_type == 'favicon':
-                # Apply favicon to Odoo company
-                company = self.env.company
-                company.write({
-                    'favicon': self.file_data
-                })
+                # In Odoo, favicon is handled through web.favicon attachment
+                # Create or update the favicon attachment
+                Attachment = self.env['ir.attachment']
+                existing_favicon = Attachment.search([
+                    ('name', '=', 'web.favicon'),
+                    ('res_model', '=', 'res.company'),
+                    ('res_id', '=', company.id)
+                ], limit=1)
+                
+                attachment_vals = {
+                    'name': 'web.favicon',
+                    'datas': self.file_data,
+                    'res_model': 'res.company',
+                    'res_id': company.id,
+                    'type': 'binary',
+                }
+                
+                if existing_favicon:
+                    existing_favicon.write(attachment_vals)
+                else:
+                    Attachment.create(attachment_vals)
+                    
                 _logger.info(f"Favicon applied to company {company.name}")
                 
             elif self.asset_type in ['logo_main', 'logo_dark', 'logo_light']:
                 # Apply logo to Odoo company
-                company = self.env.company
                 company.write({
                     'logo': self.file_data
                 })
@@ -144,7 +162,7 @@ class PosAssetManager(models.Model):
                 'tag': 'display_notification',
                 'params': {
                     'title': _('Success'),
-                    'message': _('Asset "%s" has been applied successfully. Refresh your browser to see changes.') % self.name,
+                    'message': _('Asset "%s" has been applied successfully. Refresh your browser (Ctrl+Shift+R) to see changes.') % self.name,
                     'type': 'success',
                     'sticky': False,
                 }
