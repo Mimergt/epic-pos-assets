@@ -2,10 +2,10 @@
 <odoo>
     <data>
         <!-- Asset Manager Action -->
-        <record id="action_epic_asset_tree" model="ir.actions.act_window">
+        <record id="action_epic_asset_list" model="ir.actions.act_window">
             <field name="name">Epic Assets</field>
             <field name="res_model">epic.asset</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">list,form</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
                     Create your first POS asset!
@@ -35,7 +35,7 @@
         <menuitem id="menu_epic_asset" 
                   name="Asset Manager" 
                   parent="menu_epic_pos_assets"
-                  action="action_epic_asset_tree"
+                  action="action_epic_asset_list"
                   sequence="10"/>
         
         <!-- Upload Assets Menu -->

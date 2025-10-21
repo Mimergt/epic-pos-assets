@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Asset Manager Tree View -->
-        <record id="view_epic_asset_tree" model="ir.ui.view">
-            <field name="name">epic.asset.tree</field>
+        <!-- Asset Manager List View -->
+        <record id="view_epic_asset_list" model="ir.ui.view">
+            <field name="name">epic.asset.list</field>
             <field name="model">epic.asset</field>
             <field name="arch" type="xml">
-                <tree string="POS Assets">
+                <list string="POS Assets">
                     <field name="name"/>
                     <field name="asset_type"/>
                     <field name="file_name"/>
                     <field name="active"/>
-                </tree>
+                </list>
             </field>
         </record>
 
