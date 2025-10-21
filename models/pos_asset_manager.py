@@ -107,25 +107,61 @@ class PosAssetManager(models.Model):
         """Apply the asset to the system"""
         self.ensure_one()
         
-        # Here you would implement the logic to copy the file to the correct location
-        # This depends on your Odoo setup and where assets are stored
-        
-        # For now, just mark as applied
-        self.write({
-            'applied': True,
-            'applied_date': fields.Datetime.now()
-        })
-        
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': _('Success'),
-                'message': _('Asset "%s" has been applied successfully.') % self.name,
-                'type': 'success',
-                'sticky': False,
+        try:
+            if self.asset_type == 'favicon':
+                # Apply favicon to Odoo company
+                company = self.env.company
+                company.write({
+                    'favicon': self.file_data
+                })
+                _logger.info(f"Favicon applied to company {company.name}")
+                
+            elif self.asset_type in ['logo_main', 'logo_dark', 'logo_light']:
+                # Apply logo to Odoo company
+                company = self.env.company
+                company.write({
+                    'logo': self.file_data
+                })
+                _logger.info(f"Logo applied to company {company.name}")
+                
+            elif self.asset_type == 'logo_ticket':
+                # Apply receipt logo
+                # This will be stored in the asset for POS to use
+                _logger.info(f"Receipt logo ready for POS: {self.name}")
+                
+            else:
+                # For other asset types, store in filestore or make available to POS
+                _logger.info(f"Asset {self.name} stored and ready for use")
+            
+            # Mark as applied
+            self.write({
+                'applied': True,
+                'applied_date': fields.Datetime.now()
+            })
+            
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Success'),
+                    'message': _('Asset "%s" has been applied successfully. Refresh your browser to see changes.') % self.name,
+                    'type': 'success',
+                    'sticky': False,
+                }
             }
-        }
+            
+        except Exception as e:
+            _logger.error(f"Error applying asset {self.name}: {str(e)}")
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Error'),
+                    'message': _('Failed to apply asset: %s') % str(e),
+                    'type': 'danger',
+                    'sticky': True,
+                }
+            }
 
     @api.model
     def update_pos_assets(self, assets_data):
