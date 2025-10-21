@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Asset Manager Action -->
+        <record id="action_epic_asset_tree" model="ir.actions.act_window">
+            <field name="name">Epic Assets</field>
+            <field name="res_model">epic.asset</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first POS asset!
+                </p>
+                <p>
+                    Manage logos, backgrounds, and other assets for your Point of Sale.
+                </p>
+            </field>
+        </record>
+
+        <!-- Upload Assets Wizard Action -->
+        <record id="action_epic_wizard" model="ir.actions.act_window">
+            <field name="name">Upload Assets</field>
+            <field name="res_model">epic.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="view_id" ref="view_epic_wizard_form"/>
+        </record>
+
+        <!-- Main Menu -->
+        <menuitem id="menu_epic_pos_assets" 
+                  name="POS Assets" 
+                  web_icon="point_of_sale,static/description/icon.png"
+                  sequence="100"/>
+        
+        <!-- Asset Manager Menu -->
+        <menuitem id="menu_epic_asset" 
+                  name="Asset Manager" 
+                  parent="menu_epic_pos_assets"
+                  action="action_epic_asset_tree"
+                  sequence="10"/>
+        
+        <!-- Upload Assets Menu -->
+        <menuitem id="menu_epic_wizard" 
+                  name="Upload Assets" 
+                  parent="menu_epic_pos_assets"
+                  action="action_epic_wizard"
+                  sequence="20"/>
+
+    </data>
+</odoo>
