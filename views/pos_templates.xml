@@ -2,7 +2,63 @@
 <odoo>
     <template id="assets_pos_logo" name="POS Logo Override" inherit_id="point_of_sale.index">
         <xpath expr="//head" position="inside">
-            <script type="text/javascript" src="/epic_pos_assets/static/src/js/pos_logo.js"/>
+            <script type="text/javascript">
+                // Epic POS Assets - Replace logo dynamically
+                (function() {
+                    'use strict';
+                    
+                    console.log('[Epic POS Assets] Logo replacer loaded');
+                    
+                    // Function to update logo
+                    function updatePosLogo() {
+                        const logoImages = document.querySelectorAll('img.pos-logo');
+                        if (logoImages.length > 0) {
+                            logoImages.forEach(function(img) {
+                                const currentSrc = img.getAttribute('src') || '';
+                                if (currentSrc.includes('/web/static/img/logo.png') || currentSrc.includes('logo.png')) {
+                                    // Get company ID from Odoo session
+                                    const companyId = (odoo.session_info &amp;&amp; odoo.session_info.company_id) || 1;
+                                    const newSrc = '/web/image/res.company/' + companyId + '/logo?t=' + Date.now();
+                                    console.log('[Epic POS Assets] Updating logo from', currentSrc, 'to', newSrc);
+                                    img.setAttribute('src', newSrc);
+                                    img.src = newSrc;
+                                }
+                            });
+                        }
+                    }
+                    
+                    // Wait for DOM to be ready
+                    if (document.readyState === 'loading') {
+                        document.addEventListener('DOMContentLoaded', function() {
+                            console.log('[Epic POS Assets] DOM ready, updating logo');
+                            updatePosLogo();
+                            // Update periodically in case DOM changes
+                            setInterval(updatePosLogo, 2000);
+                        });
+                    } else {
+                        console.log('[Epic POS Assets] DOM already ready, updating logo immediately');
+                        updatePosLogo();
+                        setInterval(updatePosLogo, 2000);
+                    }
+                    
+                    // Use MutationObserver to catch dynamically added logos
+                    try {
+                        const observer = new MutationObserver(function(mutations) {
+                            updatePosLogo();
+                        });
+                        
+                        observer.observe(document.body || document.documentElement, {
+                            childList: true,
+                            subtree: true,
+                            attributes: true,
+                            attributeFilter: ['src']
+                        });
+                        console.log('[Epic POS Assets] MutationObserver initialized');
+                    } catch (e) {
+                        console.error('[Epic POS Assets] Error setting up observer:', e);
+                    }
+                })();
+            </script>
         </xpath>
     </template>
 </odoo>
