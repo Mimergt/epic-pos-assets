@@ -25,6 +25,15 @@
             <field name="view_id" ref="view_epic_wizard_form"/>
         </record>
 
+        <!-- Upload POS Logo Wizard Action -->
+        <record id="action_epic_wizard_pos_logo" model="ir.actions.act_window">
+            <field name="name">Upload POS Logo</field>
+            <field name="res_model">epic.wizard.pos.logo</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="view_id" ref="view_epic_wizard_pos_logo_form"/>
+        </record>
+
         <!-- Main Menu -->
         <menuitem id="menu_epic_pos_assets" 
                   name="POS Assets" 
@@ -44,6 +53,13 @@
                   parent="menu_epic_pos_assets"
                   action="action_epic_wizard"
                   sequence="20"/>
+
+        <!-- Upload POS Logo Menu -->
+        <menuitem id="menu_epic_wizard_pos_logo" 
+                  name="Upload POS Logo" 
+                  parent="menu_epic_pos_assets"
+                  action="action_epic_wizard_pos_logo"
+                  sequence="15"/>
 
     </data>
 </odoo>

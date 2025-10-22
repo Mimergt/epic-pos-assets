@@ -17,6 +17,7 @@ class PosAssetManager(models.Model):
         ('logo_main', 'Logo Main'),
         ('logo_dark', 'Logo Dark'),
         ('logo_light', 'Logo Light'),
+        ('logo_pos', 'Logo POS Header'),
         ('favicon', 'Favicon'),
         ('splash', 'Splash Screen'),
         ('logo_ticket', 'Logo Ticket/Receipt'),
@@ -56,6 +57,7 @@ class PosAssetManager(models.Model):
             'logo_main': 'logos',
             'logo_dark': 'logos',
             'logo_light': 'logos',
+            'logo_pos': 'logos',
             'favicon': 'logos',
             'splash': 'logos',
             'logo_ticket': 'receipts',
@@ -81,6 +83,7 @@ class PosAssetManager(models.Model):
             'logo_main': 'logos/logo_main.png',
             'logo_dark': 'logos/logo_dark.png',
             'logo_light': 'logos/logo_light.png',
+            'logo_pos': 'logos/logo_pos.png',
             'favicon': 'logos/favicon.png',
             'splash': 'logos/splash.jpg',
             'logo_ticket': 'receipts/logo_ticket.png',
@@ -123,6 +126,13 @@ class PosAssetManager(models.Model):
                     'logo': self.file_data
                 })
                 _logger.info(f"Logo applied to company {company.name}")
+                
+            elif self.asset_type == 'logo_pos':
+                # Apply logo to POS - store in company logo field which POS uses
+                company.write({
+                    'logo': self.file_data
+                })
+                _logger.info(f"POS Header Logo applied to company {company.name}")
                 
             elif self.asset_type == 'logo_ticket':
                 # Apply receipt logo

@@ -1,3 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_epic_asset_user,Epic Asset User,model_epic_asset,base.group_user,1,1,1,1
 access_epic_wizard_user,Epic Wizard User,model_epic_wizard,base.group_user,1,1,1,1
+access_epic_wizard_pos_logo_user,Epic Wizard POS Logo User,model_epic_wizard_pos_logo,base.group_user,1,1,1,1

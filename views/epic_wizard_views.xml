@@ -41,5 +41,43 @@
             </field>
         </record>
 
+        <!-- Upload POS Logo Wizard Form View -->
+        <record id="view_epic_wizard_pos_logo_form" model="ir.ui.view">
+            <field name="name">epic.wizard.pos.logo.form</field>
+            <field name="model">epic.wizard.pos.logo</field>
+            <field name="arch" type="xml">
+                <form string="Upload POS Logo">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>Upload POS Header Logo</h1>
+                            <p class="oe_grey">
+                                Upload the logo that will be displayed in the POS header (next to the search bar).
+                                Recommended size: 42px height, PNG format with transparent background.
+                            </p>
+                        </div>
+                        <group>
+                            <field name="logo_file" filename="logo_filename" widget="binary" 
+                                   help="Select the logo image file (PNG, JPG, GIF, SVG, or WebP)"/>
+                            <field name="logo_filename" invisible="1"/>
+                        </group>
+                        <div class="alert alert-info" role="alert">
+                            <p><strong>Recomendaciones:</strong></p>
+                            <ul>
+                                <li>Formato recomendado: PNG con fondo transparente</li>
+                                <li>Altura: 42px (el ancho se ajustará automáticamente)</li>
+                                <li>El logo aparecerá en la parte superior del POS, junto a la barra de búsqueda</li>
+                                <li>Después de subir, refresca el POS (Ctrl+Shift+R) para ver los cambios</li>
+                            </ul>
+                        </div>
+                    </sheet>
+                    <footer>
+                        <button name="action_upload_pos_logo" string="Upload and Apply Logo" 
+                                type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
     </data>
 </odoo>
