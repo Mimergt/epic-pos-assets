@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="assets_pos_logo" name="POS Logo Override" inherit_id="point_of_sale.index">
+        <xpath expr="//head" position="inside">
+            <script type="text/javascript" src="/epic_pos_assets/static/src/js/pos_logo.js"/>
+        </xpath>
+    </template>
+</odoo>

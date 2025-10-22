@@ -29,6 +29,7 @@ Features:
         "views/epic_asset_views.xml",
         "views/epic_wizard_views.xml",
         "views/actions_menus.xml",
+        "views/pos_templates.xml",
         "security/ir.model.access.csv",
     ],
     "demo": [],
