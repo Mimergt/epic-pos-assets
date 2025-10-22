@@ -22,70 +22,6 @@ class UploadAssetsWizard(models.TransientModel):
         ('background', 'Background Images'),
         ('all', 'All Assets')
     ], string='Asset Type', required=True, default='all')
-
-
-class UploadPosLogoWizard(models.TransientModel):
-    _name = 'epic.wizard.pos.logo'
-    _description = 'Upload POS Logo Wizard'
-
-    logo_file = fields.Binary('POS Logo Image', required=True, help="Upload the logo to display in the POS header")
-    logo_filename = fields.Char('File Name')
-    
-    @api.constrains('logo_file', 'logo_filename')
-    def _check_logo_file(self):
-        if self.logo_file and self.logo_filename:
-            allowed_extensions = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp']
-            file_ext = os.path.splitext(self.logo_filename)[1].lower()
-            if file_ext not in allowed_extensions:
-                raise ValidationError(_('Invalid file format. Allowed formats: PNG, JPG, JPEG, GIF, SVG, WebP'))
-
-    def action_upload_pos_logo(self):
-        """Upload and apply POS logo directly"""
-        if not self.logo_file:
-            raise UserError(_('Please select a logo file to upload.'))
-        
-        try:
-            # Create or update the POS logo asset
-            asset_manager = self.env['epic.asset']
-            
-            # Search for existing POS logo
-            existing_logo = asset_manager.search([
-                ('asset_type', '=', 'logo_pos')
-            ], limit=1)
-            
-            vals = {
-                'name': 'POS Header Logo',
-                'asset_type': 'logo_pos',
-                'file_data': self.logo_file,
-                'file_name': self.logo_filename or 'logo_pos.png',
-                'description': 'Logo displayed in the POS header (next to search bar)'
-            }
-            
-            if existing_logo:
-                existing_logo.write(vals)
-                logo_record = existing_logo
-                _logger.info(f"Updated POS logo: {existing_logo.name}")
-            else:
-                logo_record = asset_manager.create(vals)
-                _logger.info(f"Created new POS logo: {logo_record.name}")
-            
-            # Apply the logo immediately to the company
-            logo_record.action_apply_asset()
-            
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': _('Success'),
-                    'message': _('POS logo has been successfully uploaded and applied. Please refresh your POS session (Ctrl+Shift+R) to see the changes.'),
-                    'type': 'success',
-                    'sticky': False,
-                }
-            }
-            
-        except Exception as e:
-            _logger.error(f"Error uploading POS logo: {str(e)}")
-            raise UserError(_('Error uploading POS logo: %s') % str(e))
     
     @api.constrains('zip_file')
     def _check_zip_file(self):
@@ -201,3 +137,67 @@ class UploadPosLogoWizard(models.TransientModel):
         except Exception as e:
             _logger.error(f"Error processing ZIP file: {str(e)}")
             raise UserError(_('Error processing ZIP file: %s') % str(e))
+
+
+class UploadPosLogoWizard(models.TransientModel):
+    _name = 'epic.wizard.pos.logo'
+    _description = 'Upload POS Logo Wizard'
+
+    logo_file = fields.Binary('POS Logo Image', required=True, help="Upload the logo to display in the POS header")
+    logo_filename = fields.Char('File Name')
+    
+    @api.constrains('logo_file', 'logo_filename')
+    def _check_logo_file(self):
+        if self.logo_file and self.logo_filename:
+            allowed_extensions = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp']
+            file_ext = os.path.splitext(self.logo_filename)[1].lower()
+            if file_ext not in allowed_extensions:
+                raise ValidationError(_('Invalid file format. Allowed formats: PNG, JPG, JPEG, GIF, SVG, WebP'))
+
+    def action_upload_pos_logo(self):
+        """Upload and apply POS logo directly"""
+        if not self.logo_file:
+            raise UserError(_('Please select a logo file to upload.'))
+        
+        try:
+            # Create or update the POS logo asset
+            asset_manager = self.env['epic.asset']
+            
+            # Search for existing POS logo
+            existing_logo = asset_manager.search([
+                ('asset_type', '=', 'logo_pos')
+            ], limit=1)
+            
+            vals = {
+                'name': 'POS Header Logo',
+                'asset_type': 'logo_pos',
+                'file_data': self.logo_file,
+                'file_name': self.logo_filename or 'logo_pos.png',
+                'description': 'Logo displayed in the POS header (next to search bar)'
+            }
+            
+            if existing_logo:
+                existing_logo.write(vals)
+                logo_record = existing_logo
+                _logger.info(f"Updated POS logo: {existing_logo.name}")
+            else:
+                logo_record = asset_manager.create(vals)
+                _logger.info(f"Created new POS logo: {logo_record.name}")
+            
+            # Apply the logo immediately to the company
+            logo_record.action_apply_asset()
+            
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Success'),
+                    'message': _('POS logo has been successfully uploaded and applied. Please refresh your POS session (Ctrl+Shift+R) to see the changes.'),
+                    'type': 'success',
+                    'sticky': False,
+                }
+            }
+            
+        except Exception as e:
+            _logger.error(f"Error uploading POS logo: {str(e)}")
+            raise UserError(_('Error uploading POS logo: %s') % str(e))
