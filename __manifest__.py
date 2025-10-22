@@ -31,6 +31,12 @@ Features:
         "views/actions_menus.xml",
         "security/ir.model.access.csv",
     ],
+    "assets": {
+        "point_of_sale._assets_pos": [
+            "epic_pos_assets/static/src/app/navbar/navbar.js",
+            "epic_pos_assets/static/src/app/navbar/navbar.xml",
+        ],
+    },
     "demo": [],
     "external_dependencies": {
         "python": [],

@@ -134,6 +134,17 @@ class PosAssetManager(models.Model):
                 })
                 _logger.info(f"POS Header Logo applied to company {company.name}")
                 
+                # Also update all POS configs to ensure they use the new logo
+                pos_configs = self.env['pos.config'].search([('company_id', '=', company.id)])
+                for config in pos_configs:
+                    # Force POS session to reload the logo by touching the config
+                    config.write({'__last_update': fields.Datetime.now()})
+                    _logger.info(f"Updated POS config: {config.name}")
+                
+                # Clear any cached logo URLs
+                self.env['ir.qweb']._clear_cache()
+                _logger.info("Cleared Qweb cache to force logo reload")
+                
             elif self.asset_type == 'logo_ticket':
                 # Apply receipt logo
                 # This will be stored in the asset for POS to use
@@ -149,12 +160,18 @@ class PosAssetManager(models.Model):
                 'applied_date': fields.Datetime.now()
             })
             
+            # Special message for POS logo
+            if self.asset_type == 'logo_pos':
+                message = _('POS logo has been applied successfully. IMPORTANT: Close all POS sessions and reopen them to see the new logo. You may also need to clear your browser cache (Ctrl+Shift+R or Cmd+Shift+R).')
+            else:
+                message = _('Asset "%s" has been applied successfully. Refresh your browser (Ctrl+Shift+R) to see changes.') % self.name
+            
             return {
                 'type': 'ir.actions.client',
                 'tag': 'display_notification',
                 'params': {
                     'title': _('Success'),
-                    'message': _('Asset "%s" has been applied successfully. Refresh your browser (Ctrl+Shift+R) to see changes.') % self.name,
+                    'message': message,
                     'type': 'success',
                     'sticky': False,
                 }
