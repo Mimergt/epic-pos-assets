@@ -134,16 +134,19 @@ class PosAssetManager(models.Model):
                 })
                 _logger.info(f"POS Header Logo applied to company {company.name}")
                 
-                # Also update all POS configs to ensure they use the new logo
-                pos_configs = self.env['pos.config'].search([('company_id', '=', company.id)])
-                for config in pos_configs:
-                    # Force POS session to reload the logo by touching the config
-                    config.write({'__last_update': fields.Datetime.now()})
-                    _logger.info(f"Updated POS config: {config.name}")
+                # Clear any cached logo URLs and assets
+                try:
+                    self.env['ir.qweb']._clear_cache()
+                    _logger.info("Cleared Qweb cache to force logo reload")
+                except Exception as e:
+                    _logger.warning(f"Could not clear Qweb cache: {str(e)}")
                 
-                # Clear any cached logo URLs
-                self.env['ir.qweb']._clear_cache()
-                _logger.info("Cleared Qweb cache to force logo reload")
+                # Invalidate POS sessions cache
+                try:
+                    self.env.registry.clear_cache()
+                    _logger.info("Cleared registry cache")
+                except Exception as e:
+                    _logger.warning(f"Could not clear registry cache: {str(e)}")
                 
             elif self.asset_type == 'logo_ticket':
                 # Apply receipt logo
