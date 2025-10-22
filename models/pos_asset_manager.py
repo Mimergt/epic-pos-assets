@@ -134,15 +134,17 @@ class PosAssetManager(models.Model):
                 })
                 _logger.info(f"POS Header Logo applied to company {company.name}")
                 
-                # Clear any cached logo URLs and assets
+                # Clear caches to force reload
                 try:
-                    self.env['ir.qweb']._clear_cache()
-                    _logger.info("Cleared Qweb cache to force logo reload")
+                    # Clear Qweb cache if available
+                    if hasattr(self.env['ir.qweb'], '_clear_cache'):
+                        self.env['ir.qweb']._clear_cache()
+                        _logger.info("Cleared Qweb cache")
                 except Exception as e:
                     _logger.warning(f"Could not clear Qweb cache: {str(e)}")
                 
-                # Invalidate POS sessions cache
                 try:
+                    # Clear registry cache
                     self.env.registry.clear_cache()
                     _logger.info("Cleared registry cache")
                 except Exception as e:
@@ -165,7 +167,7 @@ class PosAssetManager(models.Model):
             
             # Special message for POS logo
             if self.asset_type == 'logo_pos':
-                message = _('POS logo has been applied successfully. IMPORTANT: Close all POS sessions and reopen them to see the new logo. You may also need to clear your browser cache (Ctrl+Shift+R or Cmd+Shift+R).')
+                message = _('POS logo has been applied to the company successfully.\n\nIMPORTANT STEPS:\n1. The logo is saved at: /web/image/res.company/%s/logo\n2. Close ALL open POS sessions\n3. Clear browser cache: Ctrl+Shift+R (Windows) or Cmd+Shift+R (Mac)\n4. Or use Incognito/Private mode\n5. Open a new POS session\n\nNote: The POS uses the company logo. If it doesn\'t appear, verify the logo is visible at the URL above.') % company.id
             else:
                 message = _('Asset "%s" has been applied successfully. Refresh your browser (Ctrl+Shift+R) to see changes.') % self.name
             
